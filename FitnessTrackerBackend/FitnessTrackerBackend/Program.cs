@@ -1,4 +1,5 @@
 using FitnessTrackerBackend.Data;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,22 @@ else
 // Add services to the container.
 builder.Services.AddControllers();
 
+var corsPolicy = "_frontend";
+// CORS policy for React dev server
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(corsPolicy, policy =>
+        {
+            policy.WithOrigins("http://localhost:3000") // React dev server
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    });
+}
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -41,6 +58,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(corsPolicy);
 
 app.UseAuthorization();
 
