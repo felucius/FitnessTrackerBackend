@@ -1,8 +1,9 @@
-﻿namespace FitnessTrackerBackend.Models
+﻿
+namespace FitnessTrackerBackend.Models
 {
     public class User
     {
-        public string Id { get; set; } = default!;
+        public Guid Id { get; set; } = default!;
         public string? Gender { get; set; }
         public string Name { get; set; } = default!;
         public string Email { get; set; } = default!;

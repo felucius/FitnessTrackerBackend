@@ -21,7 +21,7 @@ namespace FitnessTrackerBackend.Data
             {
                 e.ToTable("Users");
                 e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasMaxLength(50);
+                e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
                 e.Property(x => x.Name).IsRequired().HasMaxLength(200);
                 e.Property(x => x.Email).IsRequired().HasMaxLength(256);
                 e.Property(x => x.Gender).HasMaxLength(20);
@@ -33,7 +33,7 @@ namespace FitnessTrackerBackend.Data
             {
                 e.ToTable("Exercises");
                 e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasMaxLength(50);
+                e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
                 e.Property(x => x.Name).IsRequired().HasMaxLength(200);
                 e.Property(x => x.Type).IsRequired().HasMaxLength(50);
                 e.Property(x => x.Instructions).HasColumnType("nvarchar(max)");
@@ -44,8 +44,8 @@ namespace FitnessTrackerBackend.Data
             {
                 e.ToTable("WorkoutPlans");
                 e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasMaxLength(50);
-                e.Property(x => x.UserId).IsRequired().HasMaxLength(50);
+                e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+                e.Property(x => x.UserId).IsRequired();
                 e.HasOne(x => x.User)
                  .WithMany(u => u.WorkoutPlans)
                  .HasForeignKey(x => x.UserId)
@@ -81,7 +81,7 @@ namespace FitnessTrackerBackend.Data
             {
                 e.ToTable("Progression");
                 e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasMaxLength(50);
+                e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
                 e.HasOne(x => x.User)
                  .WithMany(u => u.Progressions)
@@ -101,8 +101,8 @@ namespace FitnessTrackerBackend.Data
             {
                 e.ToTable("Dashboard");
                 e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasMaxLength(50);
-                e.Property(x => x.UserId).IsRequired().HasMaxLength(50);
+                e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+                e.Property(x => x.UserId).IsRequired();
 
                 e.HasOne(x => x.User)
                  .WithMany() // no back-collection on User for dashboards

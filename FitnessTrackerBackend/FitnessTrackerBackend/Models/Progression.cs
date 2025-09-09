@@ -2,11 +2,11 @@
 {
     public class Progression
     {
-        public string Id { get; set; } = default!;
-        public string UserId { get; set; } = default!;
+        public Guid Id { get; set; } = default!;
+        public Guid UserId { get; set; } = default!;
         public User User { get; set; } = default!;
 
-        public string ExerciseId { get; set; } = default!;
+        public Guid ExerciseId { get; set; } = default!;
         public Exercise Exercise { get; set; } = default!;
 
         public DateTime Date { get; set; }

@@ -42,9 +42,8 @@ namespace FitnessTrackerBackend.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("WorkoutPlanId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("WorkoutPlanId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -55,9 +54,10 @@ namespace FitnessTrackerBackend.Migrations
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.Dashboard", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("ExercisesToPerformJson")
                         .HasColumnType("nvarchar(max)");
@@ -68,10 +68,8 @@ namespace FitnessTrackerBackend.Migrations
                     b.Property<DateTime?>("UpcomingWorkout")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -82,9 +80,10 @@ namespace FitnessTrackerBackend.Migrations
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.Exercise", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("Instructions")
                         .HasColumnType("nvarchar(max)");
@@ -106,23 +105,22 @@ namespace FitnessTrackerBackend.Migrations
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.Progression", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("date");
 
-                    b.Property<string>("ExerciseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("ExerciseId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Reps")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Weight")
                         .HasColumnType("int");
@@ -138,9 +136,10 @@ namespace FitnessTrackerBackend.Migrations
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<int?>("Age")
                         .HasColumnType("int");
@@ -176,9 +175,10 @@ namespace FitnessTrackerBackend.Migrations
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.WorkoutPlan", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -202,10 +202,8 @@ namespace FitnessTrackerBackend.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
