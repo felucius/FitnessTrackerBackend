@@ -22,9 +22,16 @@ namespace FitnessTrackerBackend.Controllers
 
         // GET /api/users/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetById(string id)
+        public async Task<ActionResult<User>> GetById(Guid id)
         {
             var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+            return user is null ? NotFound() : Ok(user);
+        }
+
+        [HttpGet("by-email")]
+        public async Task<IActionResult> GetByEmail([FromQuery] string email)
+        {
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
             return user is null ? NotFound() : Ok(user);
         }
 
@@ -39,7 +46,7 @@ namespace FitnessTrackerBackend.Controllers
 
         // PUT /api/users/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, User user)
+        public async Task<ActionResult<User>> Update(Guid id, User user)
         {
             if (id != user.Id) return BadRequest("Route id and body id must match.");
             var exists = await _context.Users.AnyAsync(u => u.Id == id);
@@ -47,7 +54,7 @@ namespace FitnessTrackerBackend.Controllers
 
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return NoContent();
+            return user;
         }
 
         // DELETE /api/users/{id}
