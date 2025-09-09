@@ -4,6 +4,7 @@ using FitnessTrackerBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitnessTrackerBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250909141716_UpdateWorkoutPlanModelLessRequired")]
+    partial class UpdateWorkoutPlanModelLessRequired
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,52 +84,25 @@ namespace FitnessTrackerBackend.Migrations
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.Exercise", b =>
                 {
-                    b.Property<string>("ExerciseId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("BodyParts")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Equipments")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExerciseTips")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExerciseType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("Instructions")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Keywords")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("Overview")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("RelatedExerciseIds")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SecondaryMuscles")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TargetMuscles")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Variations")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VideoUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ExerciseId");
+                    b.HasKey("Id");
 
                     b.ToTable("Exercises", (string)null);
                 });
@@ -141,14 +117,13 @@ namespace FitnessTrackerBackend.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("date");
 
-                    b.Property<string>("ExerciseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("ExerciseId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Reps")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Weight")
@@ -212,6 +187,12 @@ namespace FitnessTrackerBackend.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ExerciseIds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Exercises")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("Frequency")
                         .IsRequired()
                         .HasColumnType("int");
@@ -234,21 +215,6 @@ namespace FitnessTrackerBackend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("WorkoutPlans", (string)null);
-                });
-
-            modelBuilder.Entity("WorkoutPlanExercise", b =>
-                {
-                    b.Property<string>("ExerciseId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("WorkoutPlanId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ExerciseId", "WorkoutPlanId");
-
-                    b.HasIndex("WorkoutPlanId");
-
-                    b.ToTable("WorkoutPlanExercise");
                 });
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.CalendarEvent", b =>
@@ -284,7 +250,8 @@ namespace FitnessTrackerBackend.Migrations
                     b.HasOne("FitnessTrackerBackend.Models.User", "User")
                         .WithMany("Progressions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Exercise");
 
@@ -300,21 +267,6 @@ namespace FitnessTrackerBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WorkoutPlanExercise", b =>
-                {
-                    b.HasOne("FitnessTrackerBackend.Models.Exercise", null)
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FitnessTrackerBackend.Models.WorkoutPlan", null)
-                        .WithMany()
-                        .HasForeignKey("WorkoutPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.Exercise", b =>

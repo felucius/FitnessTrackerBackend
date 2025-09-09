@@ -2,19 +2,17 @@
 {
     public class WorkoutPlan
     {
-        public Guid Id { get; set; } = default!;
+        public Guid Id { get; set; }
         public Guid UserId { get; set; } = default!;
-        public User User { get; set; } = default!;
+        public User? User { get; set; }
 
         public string Name { get; set; } = default!;
         public string Type { get; set; } = default!;
-        public string? Description { get; set; }
-        public int? Frequency { get; set; }
+        public string? Description { get; set; } = default!;
+        public int? Frequency { get; set; } = default!;
 
-        // Stored as JSON (NVARCHAR(MAX))
-        public string? ExerciseIdsJson { get; set; }
-        public string? ExercisesJson { get; set; }
+        public ICollection<Exercise>? Exercises { get; set; } = [];
 
-        public ICollection<CalendarEvent> CalendarEvents { get; set; } = new List<CalendarEvent>();
+        public ICollection<CalendarEvent>? CalendarEvents { get; set; } = [];
     }
 }

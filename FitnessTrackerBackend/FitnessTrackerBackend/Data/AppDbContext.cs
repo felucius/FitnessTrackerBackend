@@ -32,11 +32,21 @@ namespace FitnessTrackerBackend.Data
             b.Entity<Exercise>(e =>
             {
                 e.ToTable("Exercises");
-                e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
-                e.Property(x => x.Name).IsRequired().HasMaxLength(200);
-                e.Property(x => x.Type).IsRequired().HasMaxLength(50);
+                e.HasKey(x => x.ExerciseId);
+                e.Property(x => x.Name);
+                e.Property(x => x.ImageUrl);
+                e.Property(x => x.Equipments).HasColumnType("nvarchar(max)");
+                e.Property(x => x.BodyParts).HasColumnType("nvarchar(max)");
+                e.Property(x => x.ExerciseType);
+                e.Property(x => x.TargetMuscles).HasColumnType("nvarchar(max)");
+                e.Property(x => x.SecondaryMuscles).HasColumnType("nvarchar(max)");
+                e.Property(x => x.VideoUrl);
+                e.Property(x => x.Keywords).HasColumnType("nvarchar(max)");
+                e.Property(x => x.Overview).HasColumnType("nvarchar(max)");
                 e.Property(x => x.Instructions).HasColumnType("nvarchar(max)");
+                e.Property(x => x.ExerciseTips).HasColumnType("nvarchar(max)");
+                e.Property(x => x.Variations).HasColumnType("nvarchar(max)");
+                e.Property(x => x.RelatedExerciseIds).HasColumnType("nvarchar(max)");
             });
 
             // WorkoutPlans
@@ -54,11 +64,24 @@ namespace FitnessTrackerBackend.Data
                 e.Property(x => x.Name).IsRequired().HasMaxLength(200);
                 e.Property(x => x.Type).IsRequired().HasMaxLength(100);
                 e.Property(x => x.Description).HasColumnType("nvarchar(max)");
-                e.Property(x => x.Frequency);
+                e.Property(x => x.Frequency).IsRequired();
 
                 // JSON string columns
-                e.Property(x => x.ExerciseIdsJson).HasColumnType("nvarchar(max)");
-                e.Property(x => x.ExercisesJson).HasColumnType("nvarchar(max)");
+                e.HasMany(x => x.Exercises)
+                 .WithMany(x => x.WorkoutPlans)
+                 .UsingEntity<Dictionary<string, object>>(
+                    "WorkoutPlanExercise",
+                    j => j
+                        .HasOne<Exercise>()
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")        // adjust name/type if your PK is ExerciseId (string)
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<WorkoutPlan>()
+                        .WithMany()
+                        .HasForeignKey("WorkoutPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                 );
             });
 
             // Calendar
@@ -66,14 +89,16 @@ namespace FitnessTrackerBackend.Data
             {
                 e.ToTable("Calendar");
                 e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+                e.Property(x => x.Title).IsRequired().HasMaxLength(200);
+                e.Property(x => x.Start).IsRequired();
+                e.Property(x => x.End).IsRequired();
+                
                 e.HasOne(x => x.WorkoutPlan)
                  .WithMany(p => p.CalendarEvents)
                  .HasForeignKey(x => x.WorkoutPlanId)
                  .OnDelete(DeleteBehavior.Cascade);
 
-                e.Property(x => x.Title).IsRequired().HasMaxLength(200);
-                e.Property(x => x.Start).IsRequired();
-                e.Property(x => x.End).IsRequired();
             });
 
             // Progression
