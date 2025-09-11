@@ -1,4 +1,5 @@
 ﻿using FitnessTrackerBackend.Data;
+using FitnessTrackerBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitnessTrackerBackend.Controllers
@@ -15,22 +16,63 @@ namespace FitnessTrackerBackend.Controllers
         [HttpGet]
         public IActionResult GetAllCalendarEvents()
         {
-            var calendarEvents = _context.Calendar.ToList();
-            return Ok(calendarEvents);
+            try
+            {
+                var calendarEvents = _context.Calendar.ToList();
+                return Ok(calendarEvents);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        // POST: Create a new Calendar event
+        [HttpPost]
+        public IActionResult CreateCalendarEvent(CalendarEvent calendarEvent)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    calendarEvent.Id = Guid.NewGuid();
+                    _context.Calendar.Add(calendarEvent);
+                    _context.SaveChanges();
+                    return CreatedAtAction(nameof(GetAllCalendarEvents), new { id = calendarEvent.Id }, calendarEvent);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                //return StatusCode(500, "Internal server error");
+            }
+         
+            return BadRequest(ModelState);
         }
 
         // DELETE: Calendar event by ID
         [HttpDelete("{id}")]
         public IActionResult DeleteCalendarEvent(Guid id)
         {
-            var calendarEvent = _context.Calendar.Find(id);
-            if (calendarEvent == null)
+            try
             {
-                return NotFound();
+                var calendarEvent = _context.Calendar.Find(id);
+                if (calendarEvent == null)
+                {
+                    return NotFound();
+                }
+                _context.Calendar.Remove(calendarEvent);
+                _context.SaveChanges();
+                return Ok();
             }
-            _context.Calendar.Remove(calendarEvent);
-            _context.SaveChanges();
-            return Ok();
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                //return StatusCode(500, "Internal server error");
+                return Ok();
+            }
         }
     }
 }

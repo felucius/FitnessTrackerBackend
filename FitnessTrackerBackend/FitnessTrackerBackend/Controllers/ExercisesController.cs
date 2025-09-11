@@ -20,48 +20,80 @@ namespace FitnessTrackerBackend.Controllers
         [HttpGet]
         public IActionResult GetAllExercises()
         {
-            var exercises = _context.Exercises.ToList();
-            return Ok(exercises);
+            try
+            {
+                var exercises = _context.Exercises.ToList();
+                return Ok(exercises);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         // GET: api/exercises/{id}
         [HttpGet("{id}")]
         public IActionResult GetExerciseById(Guid id)
         {
-            var exercise = _context.Exercises.Find(id);
-            if (exercise == null)
+            try
             {
-                return NotFound();
+                var exercise = _context.Exercises.Find(id);
+                if (exercise == null)
+                {
+                    return NotFound();
+                }
+                return Ok(exercise);
             }
-            return Ok(exercise);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         // POST: api/exercises
         [HttpPost]
         public IActionResult CreateExercise(Exercise exercise)
         {
-            if (ModelState.IsValid)
+            try
             {
-                //exercise.ExerciseId = Guid.NewGuid();
-                _context.Exercises.Add(exercise);
-                _context.SaveChanges();
-                return CreatedAtAction(nameof(GetExerciseById), new { id = exercise.ExerciseId }, exercise);
+                if (ModelState.IsValid)
+                {
+                    //exercise.ExerciseId = Guid.NewGuid();
+                    _context.Exercises.Add(exercise);
+                    _context.SaveChanges();
+                    return CreatedAtAction(nameof(GetExerciseById), new { id = exercise.ExerciseId }, exercise);
+                }
+                return BadRequest(ModelState);
             }
-            return BadRequest(ModelState);
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         // DELETE: api/exercises/{id}
         [HttpDelete("{id}")]
         public IActionResult DeleteExercise(string id)
         {
-            var exercise = _context.Exercises.Find(id);
-            if (exercise == null)
+            try
             {
-                return NotFound();
+                var exercise = _context.Exercises.Find(id);
+                if (exercise == null)
+                {
+                    return NotFound();
+                }
+                _context.Exercises.Remove(exercise);
+                _context.SaveChanges();
+                return Ok();
             }
-            _context.Exercises.Remove(exercise);
-            _context.SaveChanges();
-            return Ok();
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
     }
 }
