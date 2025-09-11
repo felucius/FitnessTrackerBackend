@@ -1,6 +1,7 @@
 ﻿using FitnessTrackerBackend.Data;
 using FitnessTrackerBackend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FitnessTrackerBackend.Controllers
 {
@@ -22,6 +23,24 @@ namespace FitnessTrackerBackend.Controllers
                 return Ok(calendarEvents);
             }
             catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        // GET: Calendar event by workoutplan ID
+        [HttpGet("by-workoutplan/{id}")]
+        public async Task<IActionResult> GetCalendarEvents(Guid id) {
+            try
+            {
+                var calendarEvents = await _context.Calendar
+                    .Where(CalendarEvent => CalendarEvent.WorkoutPlanId == id)
+                    .ToListAsync();
+
+                return Ok(calendarEvents);
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return StatusCode(500, "Internal server error");
