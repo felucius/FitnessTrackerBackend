@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using FitnessTrackerBackend.Data;
+﻿using FitnessTrackerBackend.Data;
 using FitnessTrackerBackend.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FitnessTrackerBackend.Controllers
 {
@@ -30,19 +25,22 @@ namespace FitnessTrackerBackend.Controllers
         }
 
         // GET: WorkoutPlan by ID
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetWorkoutPlanById(Guid id)
+        [HttpGet("by-user/{id}")]
+        public async Task<IActionResult> GetWorkoutPlanByUserId(Guid id)
         {
-            var workoutPlan = await _context.WorkoutPlans
+            // Get workout plans by user ID, including related Exercises and User
+            var workoutPlans = await _context.WorkoutPlans
+                .Include(wp => wp.Exercises)
                 .Include(wp => wp.User)
-                .FirstOrDefaultAsync(wp => wp.Id == id);
+                .Where(wp => wp.UserId == id)
+                .ToListAsync();
 
-            if (workoutPlan == null)
+            if (workoutPlans == null)
             {
                 return NotFound();
             }
 
-            return Ok(workoutPlan);
+            return Ok(workoutPlans);
         }
 
         // POST: Create a new WorkoutPlan
@@ -60,9 +58,50 @@ namespace FitnessTrackerBackend.Controllers
                 workoutPlan.Id = Guid.NewGuid();
                 _context.Add(workoutPlan);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetWorkoutPlanById), new { id = workoutPlan.Id }, workoutPlan);
+                return CreatedAtAction(nameof(GetWorkoutPlanByUserId), new { id = workoutPlan.Id }, workoutPlan);
             }
 
+            return BadRequest(ModelState);
+        }
+
+        // PUT: Update an existing WorkoutPlan
+        [HttpPut("{id}")]
+        public async Task<ActionResult<WorkoutPlan>> UpdateWorkoutPlan(Guid id, WorkoutPlan workoutPlan)
+        {
+            if (id != workoutPlan.Id)
+            {
+                return BadRequest();
+            }
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //_context.Update(workoutPlan);
+                    _context.Entry(workoutPlan).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    var WorkoutPlanExists = _context.WorkoutPlans.Any(e => e.Id == workoutPlan.Id);
+                    if (!WorkoutPlanExists)
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                // Return the updated workout plan with related Exercises and User
+                var updatedWorkoutPlan = _context.WorkoutPlans
+                    .Include(wp => wp.Exercises)
+                    .Include(wp => wp.User)
+                    .Where(wp => wp.Id == workoutPlan.Id)
+                    .First();
+
+                return updatedWorkoutPlan;
+            }
             return BadRequest(ModelState);
         }
     }
