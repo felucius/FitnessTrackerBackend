@@ -3,6 +3,10 @@
     public class Exercise
     {
         public string ExerciseId { get; set; } = default!;
+
+        public Guid WorkoutPlanId { get; set; }
+        public WorkoutPlan? WorkoutPlan { get; set; }
+
         public string? Name { get; set; }
         public string? ImageUrl { get; set; }
         public string[]? Equipments { get; set; }
@@ -18,7 +22,6 @@
         public string[]? Variations { get; set; }
         public string[]? RelatedExerciseIds { get; set; }
 
-        public ICollection<WorkoutPlan>? WorkoutPlans { get; set; } = new List<WorkoutPlan>();
 
         public ICollection<Progression>? Progressions { get; set; } = new List<Progression>();
     }
