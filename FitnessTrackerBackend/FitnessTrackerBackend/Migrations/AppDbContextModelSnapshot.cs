@@ -126,7 +126,12 @@ namespace FitnessTrackerBackend.Migrations
                     b.Property<string>("VideoUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("WorkoutPlanId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("ExerciseId");
+
+                    b.HasIndex("WorkoutPlanId");
 
                     b.ToTable("Exercises", (string)null);
                 });
@@ -236,21 +241,6 @@ namespace FitnessTrackerBackend.Migrations
                     b.ToTable("WorkoutPlans", (string)null);
                 });
 
-            modelBuilder.Entity("WorkoutPlanExercise", b =>
-                {
-                    b.Property<string>("ExerciseId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("WorkoutPlanId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ExerciseId", "WorkoutPlanId");
-
-                    b.HasIndex("WorkoutPlanId");
-
-                    b.ToTable("WorkoutPlanExercise");
-                });
-
             modelBuilder.Entity("FitnessTrackerBackend.Models.CalendarEvent", b =>
                 {
                     b.HasOne("FitnessTrackerBackend.Models.WorkoutPlan", "WorkoutPlan")
@@ -273,6 +263,17 @@ namespace FitnessTrackerBackend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FitnessTrackerBackend.Models.Exercise", b =>
+                {
+                    b.HasOne("FitnessTrackerBackend.Models.WorkoutPlan", "WorkoutPlan")
+                        .WithMany("Exercises")
+                        .HasForeignKey("WorkoutPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkoutPlan");
+                });
+
             modelBuilder.Entity("FitnessTrackerBackend.Models.Progression", b =>
                 {
                     b.HasOne("FitnessTrackerBackend.Models.Exercise", "Exercise")
@@ -284,7 +285,7 @@ namespace FitnessTrackerBackend.Migrations
                     b.HasOne("FitnessTrackerBackend.Models.User", "User")
                         .WithMany("Progressions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Exercise");
 
@@ -302,21 +303,6 @@ namespace FitnessTrackerBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WorkoutPlanExercise", b =>
-                {
-                    b.HasOne("FitnessTrackerBackend.Models.Exercise", null)
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FitnessTrackerBackend.Models.WorkoutPlan", null)
-                        .WithMany()
-                        .HasForeignKey("WorkoutPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("FitnessTrackerBackend.Models.Exercise", b =>
                 {
                     b.Navigation("Progressions");
@@ -332,6 +318,8 @@ namespace FitnessTrackerBackend.Migrations
             modelBuilder.Entity("FitnessTrackerBackend.Models.WorkoutPlan", b =>
                 {
                     b.Navigation("CalendarEvents");
+
+                    b.Navigation("Exercises");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,25 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FitnessTrackerBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialModelCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Exercises",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Instructions = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Exercises", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -65,34 +51,6 @@ namespace FitnessTrackerBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Progression",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExerciseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Date = table.Column<DateTime>(type: "date", nullable: false),
-                    Weight = table.Column<int>(type: "int", nullable: false),
-                    Reps = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Progression", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Progression_Exercises_ExerciseId",
-                        column: x => x.ExerciseId,
-                        principalTable: "Exercises",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Progression_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "WorkoutPlans",
                 columns: table => new
                 {
@@ -101,9 +59,7 @@ namespace FitnessTrackerBackend.Migrations
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Frequency = table.Column<int>(type: "int", nullable: true),
-                    ExerciseIdsJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ExercisesJson = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Frequency = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -120,7 +76,7 @@ namespace FitnessTrackerBackend.Migrations
                 name: "Calendar",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     WorkoutPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Start = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -138,6 +94,65 @@ namespace FitnessTrackerBackend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Exercises",
+                columns: table => new
+                {
+                    ExerciseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    WorkoutPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Equipments = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BodyParts = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExerciseType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetMuscles = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecondaryMuscles = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VideoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Keywords = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Overview = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Instructions = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExerciseTips = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Variations = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RelatedExerciseIds = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Exercises", x => x.ExerciseId);
+                    table.ForeignKey(
+                        name: "FK_Exercises_WorkoutPlans_WorkoutPlanId",
+                        column: x => x.WorkoutPlanId,
+                        principalTable: "WorkoutPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Progression",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ExerciseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Date = table.Column<DateTime>(type: "date", nullable: false),
+                    Weight = table.Column<int>(type: "int", nullable: false),
+                    Reps = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Progression", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Progression_Exercises_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercises",
+                        principalColumn: "ExerciseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Progression_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Calendar_WorkoutPlanId",
                 table: "Calendar",
@@ -147,6 +162,11 @@ namespace FitnessTrackerBackend.Migrations
                 name: "IX_Dashboard_UserId",
                 table: "Dashboard",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exercises_WorkoutPlanId",
+                table: "Exercises",
+                column: "WorkoutPlanId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Progression_ExerciseId",
@@ -177,10 +197,10 @@ namespace FitnessTrackerBackend.Migrations
                 name: "Progression");
 
             migrationBuilder.DropTable(
-                name: "WorkoutPlans");
+                name: "Exercises");
 
             migrationBuilder.DropTable(
-                name: "Exercises");
+                name: "WorkoutPlans");
 
             migrationBuilder.DropTable(
                 name: "Users");
