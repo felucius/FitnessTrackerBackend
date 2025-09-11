@@ -56,17 +56,5 @@ namespace FitnessTrackerBackend.Controllers
             await _context.SaveChangesAsync();
             return user;
         }
-
-        // DELETE /api/users/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user is null) return NotFound();
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
     }
 }
