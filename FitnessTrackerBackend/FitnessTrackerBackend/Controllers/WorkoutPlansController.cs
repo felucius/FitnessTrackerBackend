@@ -24,7 +24,23 @@ namespace FitnessTrackerBackend.Controllers
             return Ok(workoutPlans);
         }
 
-        // GET: WorkoutPlan by ID
+        // GET: Workoutplan by ID
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetWorkoutPlanById(Guid id)
+        {
+            // Get workout plan by ID, including related Exercises and User
+            var workoutPlan = await _context.WorkoutPlans
+                .Include(wp => wp.Exercises)
+                .Include(wp => wp.User)
+                .FirstOrDefaultAsync(wp => wp.Id == id);
+            if (workoutPlan == null)
+            {
+                return NotFound();
+            }
+            return Ok(workoutPlan);
+        }
+
+        // GET: WorkoutPlan by UserID
         [HttpGet("by-user/{id}")]
         public async Task<IActionResult> GetWorkoutPlanByUserId(Guid id)
         {
@@ -103,6 +119,20 @@ namespace FitnessTrackerBackend.Controllers
                 return updatedWorkoutPlan;
             }
             return BadRequest(ModelState);
+        }
+
+        // DELETE: Delete a WorkoutPlan
+        [HttpDelete("{id}")]
+        public ActionResult DeleteWorkoutPlan(Guid id) 
+        {
+            var workoutPlan = _context.WorkoutPlans.Find(id);
+            if (workoutPlan == null)
+            {
+                return NotFound();
+            }
+            _context.WorkoutPlans.Remove(workoutPlan);
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }
