@@ -49,5 +49,19 @@ namespace FitnessTrackerBackend.Controllers
             }
             return BadRequest(ModelState);
         }
+
+        // DELETE: api/exercises/{id}
+        [HttpDelete("{id}")]
+        public IActionResult DeleteExercise(string id)
+        {
+            var exercise = _context.Exercises.Find(id);
+            if (exercise == null)
+            {
+                return NotFound();
+            }
+            _context.Exercises.Remove(exercise);
+            _context.SaveChanges();
+            return Ok();
+        }
     }
 }
