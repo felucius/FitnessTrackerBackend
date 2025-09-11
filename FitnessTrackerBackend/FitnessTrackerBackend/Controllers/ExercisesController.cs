@@ -60,7 +60,6 @@ namespace FitnessTrackerBackend.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    //exercise.ExerciseId = Guid.NewGuid();
                     _context.Exercises.Add(exercise);
                     _context.SaveChanges();
                     return CreatedAtAction(nameof(GetExerciseById), new { id = exercise.ExerciseId }, exercise);
