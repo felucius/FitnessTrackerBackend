@@ -56,6 +56,7 @@ namespace FitnessTrackerBackend.Data
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
                 e.Property(x => x.UserId).IsRequired();
+
                 e.HasOne(x => x.User)
                  .WithMany(u => u.WorkoutPlans)
                  .HasForeignKey(x => x.UserId)
@@ -68,20 +69,9 @@ namespace FitnessTrackerBackend.Data
 
                 // JSON string columns
                 e.HasMany(x => x.Exercises)
-                 .WithMany(x => x.WorkoutPlans)
-                 .UsingEntity<Dictionary<string, object>>(
-                    "WorkoutPlanExercise",
-                    j => j
-                        .HasOne<Exercise>()
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")        // adjust name/type if your PK is ExerciseId (string)
-                        .OnDelete(DeleteBehavior.Cascade),
-                    j => j
-                        .HasOne<WorkoutPlan>()
-                        .WithMany()
-                        .HasForeignKey("WorkoutPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                 );
+                 .WithOne(x => x.WorkoutPlan)
+                 .HasForeignKey(x => x.WorkoutPlanId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
 
             // Calendar
@@ -111,7 +101,7 @@ namespace FitnessTrackerBackend.Data
                 e.HasOne(x => x.User)
                  .WithMany(u => u.Progressions)
                  .HasForeignKey(x => x.UserId)
-                 .OnDelete(DeleteBehavior.Cascade);
+                 .OnDelete(DeleteBehavior.NoAction);
 
                 e.HasOne(x => x.Exercise)
                  .WithMany(ex => ex.Progressions)
