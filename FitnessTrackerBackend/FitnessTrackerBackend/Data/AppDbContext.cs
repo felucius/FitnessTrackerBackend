@@ -66,7 +66,7 @@ namespace FitnessTrackerBackend.Data
                 e.Property(x => x.Name).IsRequired().HasMaxLength(200);
                 e.Property(x => x.Type).IsRequired().HasMaxLength(100);
                 e.Property(x => x.Description).HasColumnType("nvarchar(max)");
-                e.Property(x => x.Frequency).IsRequired();
+                e.Property(x => x.Frequency);
 
                 // JSON string columns
                 e.HasMany(x => x.Exercises)

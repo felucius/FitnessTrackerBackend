@@ -1,7 +1,6 @@
 ﻿using FitnessTrackerBackend.Data;
 using FitnessTrackerBackend.Dto.Mappings;
 using FitnessTrackerBackend.Dto.Users;
-using FitnessTrackerBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
