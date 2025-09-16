@@ -1,4 +1,6 @@
 ﻿using FitnessTrackerBackend.Data;
+using FitnessTrackerBackend.Dto.CalendarEvents;
+using FitnessTrackerBackend.Dto.Mappings;
 using FitnessTrackerBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,83 +17,88 @@ namespace FitnessTrackerBackend.Controllers
 
         // GET: Calendar events
         [HttpGet]
-        public IActionResult GetAllCalendarEvents()
+        [ProducesResponseType(typeof(IEnumerable<CalendarEventResponse>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllCalendarEvents(CancellationToken ct)
         {
-            try
-            {
-                var calendarEvents = _context.Calendar.ToList();
-                return Ok(calendarEvents);
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            var events  = await _context.Calendar
+                .OrderBy(e => e.Start)
+                .Select(e => new CalendarEventResponse(
+                    e.Id,
+                    e.Title,
+                    e.WorkoutPlanId,
+                    e.Start,
+                    e.End,
+                    e.AllDay
+                ))
+                .ToListAsync(ct);
+
+            return Ok(events);
         }
 
         // GET: Calendar event by workoutplan ID
-        [HttpGet("by-workoutplan/{id}")]
-        public async Task<IActionResult> GetCalendarEvents(Guid id) {
-            try
-            {
-                var calendarEvents = await _context.Calendar
-                    .Where(CalendarEvent => CalendarEvent.WorkoutPlanId == id)
-                    .ToListAsync();
+        [HttpGet("by-workoutplan/{id:guid}")]
+        [ProducesResponseType(typeof(CalendarEventResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCalendarEvents(Guid id, CancellationToken ct) 
+        {
+            var calendarEvents = await _context.Calendar
+                .Where(x => x.WorkoutPlanId == id)
+                .OrderBy(x => x.Start)
+                .Select(x => new CalendarEventResponse(
+                    x.Id,
+                    x.Title,
+                    x.WorkoutPlanId,
+                    x.Start,
+                    x.End,
+                    x.AllDay
+                ))
+                .SingleOrDefaultAsync();
 
-                return Ok(calendarEvents);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            return Ok(calendarEvents);
         }
 
         // POST: Create a new Calendar event
         [HttpPost]
-        public IActionResult CreateCalendarEvent(CalendarEvent calendarEvent)
+        [ProducesResponseType(typeof(CalendarEventResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateCalendarEvent(CreateCalendarEventRequest request, CancellationToken ct)
         {
-            try
+            if (string.IsNullOrWhiteSpace(request.Title))
             {
-                if (ModelState.IsValid)
-                {
-                    calendarEvent.Id = Guid.NewGuid();
-                    _context.Calendar.Add(calendarEvent);
-                    _context.SaveChanges();
-                    return CreatedAtAction(nameof(GetAllCalendarEvents), new { id = calendarEvent.Id }, calendarEvent);
-                }
+                ModelState.AddModelError(nameof(request.Title), "Title is required.");
+            }
+            if(request.End <= request.Start)
+            {
+                ModelState.AddModelError(nameof(request.End), "End time must be after start time.");
+            }
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                //return StatusCode(500, "Internal server error");
-            }
-         
-            return BadRequest(ModelState);
+            var entity = request.ToModel();
+            _context.Calendar.Add(entity);
+            await _context.SaveChangesAsync(ct);
+
+            var response = entity.ToResponse();
+            // Need to test this result
+            return CreatedAtAction(nameof(GetCalendarEvents), new { id = response.Id }, response);
         }
 
         // DELETE: Calendar event by ID
-        [HttpDelete("{id}")]
-        public IActionResult DeleteCalendarEvent(Guid id)
+        [HttpDelete("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteCalendarEvent(Guid id, CancellationToken ct)
         {
-            try
+            var calendarEvent = await _context.Calendar.FindAsync(id, ct);
+            if (calendarEvent == null)
             {
-                var calendarEvent = _context.Calendar.Find(id);
-                if (calendarEvent == null)
-                {
-                    return NotFound();
-                }
-                _context.Calendar.Remove(calendarEvent);
-                _context.SaveChanges();
-                return Ok();
+                return NotFound();
             }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                //return StatusCode(500, "Internal server error");
-                return Ok();
-            }
+            _context.Calendar.Remove(calendarEvent);
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }
