@@ -33,6 +33,7 @@ namespace FitnessTrackerBackend.Data
             {
                 e.ToTable("Exercises");
                 e.HasKey(x => x.ExerciseId);
+                e.Property(x => x.ExerciseId).IsRequired().HasMaxLength(100);
                 e.Property(x => x.Name);
                 e.Property(x => x.ImageUrl);
                 e.Property(x => x.Equipments).HasColumnType("nvarchar(max)");
