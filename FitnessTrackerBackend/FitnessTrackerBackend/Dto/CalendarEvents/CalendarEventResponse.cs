@@ -3,8 +3,8 @@
     public sealed record CalendarEventResponse (
         
         Guid Id,
-        string Title,
         Guid WorkoutPlanId,
+        string Title,
         DateTimeOffset Start,
         DateTimeOffset End,
         bool AllDay

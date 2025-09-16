@@ -24,8 +24,8 @@ namespace FitnessTrackerBackend.Controllers
                 .OrderBy(e => e.Start)
                 .Select(e => new CalendarEventResponse(
                     e.Id,
-                    e.Title,
                     e.WorkoutPlanId,
+                    e.Title,
                     e.Start,
                     e.End,
                     e.AllDay
@@ -46,8 +46,8 @@ namespace FitnessTrackerBackend.Controllers
                 .OrderBy(x => x.Start)
                 .Select(x => new CalendarEventResponse(
                     x.Id,
-                    x.Title,
                     x.WorkoutPlanId,
+                    x.Title,
                     x.Start,
                     x.End,
                     x.AllDay
