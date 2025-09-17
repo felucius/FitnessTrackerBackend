@@ -172,6 +172,7 @@ namespace FitnessTrackerBackend.Controllers
                 {
                     return NotFound();
                 }
+                
                 _context.WorkoutPlans.Remove(workoutPlan);
                 await _context.SaveChangesAsync(ct);
                 return Ok();
