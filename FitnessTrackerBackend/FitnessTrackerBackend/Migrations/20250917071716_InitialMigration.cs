@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FitnessTrackerBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialModelCreation : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,7 +59,7 @@ namespace FitnessTrackerBackend.Migrations
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Frequency = table.Column<int>(type: "int", nullable: false)
+                    Frequency = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -98,7 +98,7 @@ namespace FitnessTrackerBackend.Migrations
                 name: "Exercises",
                 columns: table => new
                 {
-                    ExerciseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ExerciseId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     WorkoutPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -131,8 +131,8 @@ namespace FitnessTrackerBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ExerciseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExerciseId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
                     Weight = table.Column<int>(type: "int", nullable: false),
                     Reps = table.Column<int>(type: "int", nullable: false)
