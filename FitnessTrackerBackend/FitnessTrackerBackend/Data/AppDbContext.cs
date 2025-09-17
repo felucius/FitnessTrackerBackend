@@ -99,6 +99,8 @@ namespace FitnessTrackerBackend.Data
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
+                e.Property(x => x.ExerciseId).IsRequired().HasMaxLength(100);
+
                 e.HasOne(x => x.User)
                  .WithMany(u => u.Progressions)
                  .HasForeignKey(x => x.UserId)
