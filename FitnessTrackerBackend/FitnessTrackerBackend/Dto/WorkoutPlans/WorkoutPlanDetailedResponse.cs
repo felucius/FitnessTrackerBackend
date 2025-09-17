@@ -13,6 +13,5 @@ namespace FitnessTrackerBackend.Dto.WorkoutPlans
         string? Description,
         int? Frequency,
         IReadOnlyList<ExerciseListItemResponse> Exercises
-    // WIP: need more fields for workoutplan details
     );
 }

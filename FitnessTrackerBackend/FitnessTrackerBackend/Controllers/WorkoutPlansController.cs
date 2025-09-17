@@ -84,7 +84,7 @@ namespace FitnessTrackerBackend.Controllers
                     return NotFound();
                 }
 
-                var workoutPlansDto = workoutPlans.Select(wp => wp.ToDetailResponse()).ToList();
+                var workoutPlansDto = workoutPlans.Select(wp => wp.ToDetailedResponse()).ToList();
 
                 return Ok(workoutPlansDto);
             }
@@ -103,14 +103,6 @@ namespace FitnessTrackerBackend.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // If Workoutplan exercises are zero or null, initialize to empty list
-                    //if (workoutPlan.Exercises == null || workoutPlan.Exercises.Count == 0)
-                    //{
-                    //    workoutPlan.Exercises = new List<Exercise>();
-                    //}
-
-                    //workoutPlan.Id = Guid.NewGuid();
-
                     if (workoutPlan.UserId == Guid.Empty)
                     {
                         ModelState.AddModelError(nameof(workoutPlan.UserId), "UserId is required.");
@@ -163,19 +155,9 @@ namespace FitnessTrackerBackend.Controllers
             entity.Type = workoutPlan.Type;
             entity.Description = workoutPlan.Description;
             entity.Frequency = workoutPlan.Frequency;
-            //entity.Exercises = workoutPlan.Exercises;
 
             await _context.SaveChangesAsync(ct);
-            return Ok(entity.ToDetailResponse());
-
-            // Return the updated workout plan with related Exercises and User
-            //var updatedWorkoutPlan = _context.WorkoutPlans
-            //    .Include(wp => wp.Exercises)
-            //    .Include(wp => wp.User)
-            //    .Where(wp => wp.Id == workoutPlan.Id)
-            //    .First();
-
-            //return updatedWorkoutPlan;
+            return Ok(entity.ToDetailedResponse());
         }
 
         // DELETE: Delete a WorkoutPlan

@@ -36,7 +36,7 @@ namespace FitnessTrackerBackend.Dto.Mappings
             return response;
         }
 
-        public static WorkoutPlanDetailedResponse ToDetailResponse(this WorkoutPlan wp)
+        public static WorkoutPlanDetailedResponse ToDetailedResponse(this WorkoutPlan wp)
         {
             var response = new WorkoutPlanDetailedResponse(
                 Id: wp.Id,
