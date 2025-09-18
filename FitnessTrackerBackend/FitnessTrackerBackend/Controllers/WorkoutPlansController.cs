@@ -1,4 +1,6 @@
 ﻿using FitnessTrackerBackend.Data;
+using FitnessTrackerBackend.Dto.Mappings;
+using FitnessTrackerBackend.Dto.WorkoutPlans;
 using FitnessTrackerBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,12 +20,17 @@ namespace FitnessTrackerBackend.Controllers
 
         // GET: WorkoutPlans
         [HttpGet]
-        public async Task<IActionResult> GetAllWorkoutPlans()
+        public async Task<ActionResult<IEnumerable<WorkoutPlanResponse>>> GetAllWorkoutPlans(CancellationToken ct)
         {
             try
             {
-                var workoutPlans = await _context.WorkoutPlans.AsNoTracking().ToListAsync();
-                return Ok(workoutPlans);
+                var workoutPlans = await _context.WorkoutPlans
+                    .AsNoTracking()
+                    .ToListAsync(ct);
+                
+                var workoutPlanDto = workoutPlans.Select(wp => wp.ToResponse()).ToList();
+
+                return Ok(workoutPlanDto);
             }
             catch (Exception ex)
             {
@@ -34,7 +41,7 @@ namespace FitnessTrackerBackend.Controllers
 
         // GET: Workoutplan by ID
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetWorkoutPlanById(Guid id)
+        public async Task<ActionResult<WorkoutPlanResponse>> GetWorkoutPlanById(Guid id, CancellationToken ct)
         {
             try
             {
@@ -42,12 +49,15 @@ namespace FitnessTrackerBackend.Controllers
                 var workoutPlan = await _context.WorkoutPlans
                     .Include(wp => wp.Exercises)
                     .Include(wp => wp.User)
-                    .FirstOrDefaultAsync(wp => wp.Id == id);
+                    .FirstOrDefaultAsync(wp => wp.Id == id, ct);
+
                 if (workoutPlan == null)
                 {
                     return NotFound();
                 }
-                return Ok(workoutPlan);
+
+
+                return Ok(workoutPlan.ToResponse());
             }
             catch (Exception ex)
             {
@@ -58,7 +68,7 @@ namespace FitnessTrackerBackend.Controllers
 
         // GET: WorkoutPlan by UserID
         [HttpGet("by-user/{id}")]
-        public async Task<IActionResult> GetWorkoutPlanByUserId(Guid id)
+        public async Task<ActionResult<IEnumerable<WorkoutPlanDetailedResponse>>> GetWorkoutPlansByUserId(Guid id, CancellationToken ct)
         {
             try
             {
@@ -67,14 +77,16 @@ namespace FitnessTrackerBackend.Controllers
                     .Include(wp => wp.Exercises)
                     .Include(wp => wp.User)
                     .Where(wp => wp.UserId == id)
-                    .ToListAsync();
+                    .ToListAsync(ct);
 
                 if (workoutPlans == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(workoutPlans);
+                var workoutPlansDto = workoutPlans.Select(wp => wp.ToDetailedResponse()).ToList();
+
+                return Ok(workoutPlansDto);
             }
             catch(Exception ex)
             {
@@ -85,22 +97,38 @@ namespace FitnessTrackerBackend.Controllers
 
         // POST: Create a new WorkoutPlan
         [HttpPost]
-        public async Task<IActionResult> CreateWorkoutPlan(WorkoutPlan workoutPlan)
+        public async Task<ActionResult<WorkoutPlanResponse>> CreateWorkoutPlan(CreateWorkoutPlanRequest workoutPlan, CancellationToken ct)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    // If Workoutplan exercises are zero or null, initialize to empty list
-                    if (workoutPlan.Exercises == null || workoutPlan.Exercises.Count == 0)
+                    if (workoutPlan.UserId == Guid.Empty)
                     {
-                        workoutPlan.Exercises = new List<Exercise>();
+                        ModelState.AddModelError(nameof(workoutPlan.UserId), "UserId is required.");
                     }
 
-                    workoutPlan.Id = Guid.NewGuid();
-                    _context.Add(workoutPlan);
-                    await _context.SaveChangesAsync();
-                    return CreatedAtAction(nameof(GetWorkoutPlanByUserId), new { id = workoutPlan.Id }, workoutPlan);
+                    if (string.IsNullOrWhiteSpace(workoutPlan.Name))
+                    {
+                        ModelState.AddModelError(nameof(workoutPlan.Name), "Name is required.");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(workoutPlan.Type))
+                    {
+                        ModelState.AddModelError(nameof(workoutPlan.Type), "Type is required.");
+                    }
+
+                    if (!ModelState.IsValid)
+                    {
+                        return ValidationProblem(ModelState);
+                    }
+                    
+                    var workoutPlanDto = workoutPlan.ToModel();
+                    _context.WorkoutPlans.Add(workoutPlanDto);
+                    await _context.SaveChangesAsync(ct);
+                    
+                    var response = workoutPlanDto.ToResponse();
+                    return CreatedAtAction(nameof(GetWorkoutPlanById), new { id = response.Id }, response);
                 }
 
                 return BadRequest(ModelState);
@@ -114,66 +142,39 @@ namespace FitnessTrackerBackend.Controllers
 
         // PUT: Update an existing WorkoutPlan
         [HttpPut("{id}")]
-        public async Task<ActionResult<WorkoutPlan>> UpdateWorkoutPlan(Guid id, WorkoutPlan workoutPlan)
+        public async Task<ActionResult<WorkoutPlanDetailedResponse>> UpdateWorkoutPlan(Guid id, CreateWorkoutPlanRequest workoutPlan, CancellationToken ct)
         {
-            try
-            {
-                if (id != workoutPlan.Id)
-                {
-                    return BadRequest();
-                }
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        //_context.Update(workoutPlan);
-                        _context.Entry(workoutPlan).State = EntityState.Modified;
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        var WorkoutPlanExists = _context.WorkoutPlans.Any(e => e.Id == workoutPlan.Id);
-                        if (!WorkoutPlanExists)
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
+            var entity = await _context.WorkoutPlans.FirstOrDefaultAsync(wp => wp.Id == id, ct);
 
-                    // Return the updated workout plan with related Exercises and User
-                    var updatedWorkoutPlan = _context.WorkoutPlans
-                        .Include(wp => wp.Exercises)
-                        .Include(wp => wp.User)
-                        .Where(wp => wp.Id == workoutPlan.Id)
-                        .First();
-
-                    return updatedWorkoutPlan;
-                }
-                return BadRequest(ModelState);
-            }
-            catch(Exception ex)
+            if(entity == null)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return NotFound();
             }
+
+            entity.Name = workoutPlan.Name;
+            entity.Type = workoutPlan.Type;
+            entity.Description = workoutPlan.Description;
+            entity.Frequency = workoutPlan.Frequency;
+
+            await _context.SaveChangesAsync(ct);
+            return Ok(entity.ToDetailedResponse());
         }
 
         // DELETE: Delete a WorkoutPlan
         [HttpDelete("{id}")]
-        public ActionResult DeleteWorkoutPlan(Guid id) 
+        public async Task<IActionResult> DeleteWorkoutPlan(Guid id, CancellationToken ct) 
         {
             try
             {
-                var workoutPlan = _context.WorkoutPlans.Find(id);
+                var workoutPlan = await _context.WorkoutPlans.FindAsync(id, ct);
+
                 if (workoutPlan == null)
                 {
                     return NotFound();
                 }
+                
                 _context.WorkoutPlans.Remove(workoutPlan);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync(ct);
                 return Ok();
             }
             catch(Exception ex)

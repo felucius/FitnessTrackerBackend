@@ -1,5 +1,6 @@
 ﻿using FitnessTrackerBackend.Data;
-using FitnessTrackerBackend.Models;
+using FitnessTrackerBackend.Dto.Mappings;
+using FitnessTrackerBackend.Dto.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,16 +11,24 @@ namespace FitnessTrackerBackend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public UsersController(AppDbContext context) => _context = context;
-
+        public UsersController(AppDbContext context)
+        {
+            _context = context;
+        }
+        
         // GET /api/users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAll()
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetAll(CancellationToken ct)
         {
             try
             {
-                var users = await _context.Users.AsNoTracking().ToListAsync();
-                return users;
+                var users = await _context.Users
+                    .AsNoTracking()
+                    .ToListAsync(ct);
+
+                var userDto = users.Select(u => u.ToResponse()).ToList();
+
+                return Ok(userDto);
             }
             catch(Exception ex)
             {
@@ -30,12 +39,20 @@ namespace FitnessTrackerBackend.Controllers
 
         // GET /api/users/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetById(Guid id)
+        public async Task<ActionResult<UserResponse>> GetById(Guid id, CancellationToken ct)
         {
             try
             {
-                var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
-                return user is null ? NotFound() : Ok(user);
+                var user = await _context.Users
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == id, ct);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                
+                return Ok(user.ToResponse());
             }
             catch(Exception ex)
             {
@@ -45,12 +62,20 @@ namespace FitnessTrackerBackend.Controllers
         }
 
         [HttpGet("by-email")]
-        public async Task<IActionResult> GetByEmail([FromQuery] string email)
+        public async Task<ActionResult<UserResponse>> GetByEmail([FromQuery] string email, CancellationToken ct)
         {
             try
             {
-                var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
-                return user is null ? NotFound() : Ok(user);
+                var user = await _context.Users
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Email == email, ct);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(user.ToResponse());
             }
             catch(Exception ex) {
                 Console.WriteLine($"An error occurred: {ex.Message}");
@@ -60,13 +85,31 @@ namespace FitnessTrackerBackend.Controllers
 
         // POST /api/users
         [HttpPost]
-        public async Task<ActionResult<User>> Create(User user)
+        public async Task<ActionResult<UserResponse>> Create(CreateUserRequest user, CancellationToken ct)
         {
+            if (string.IsNullOrWhiteSpace(user.Name))
+            {
+                ModelState.AddModelError(nameof(user.Name), "Name is required.");
+            }
+            
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                ModelState.AddModelError(nameof(user.Email), "Email is required.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
             try
             {
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+                var userDto = user.ToModel();
+                _context.Users.Add(userDto);
+                await _context.SaveChangesAsync(ct);
+
+                var response = userDto.ToResponse();
+                return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
             catch(Exception ex)
             {
@@ -77,17 +120,26 @@ namespace FitnessTrackerBackend.Controllers
 
         // PUT /api/users/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult<User>> Update(Guid id, User user)
+        public async Task<ActionResult<UserResponse>> Update(Guid id, CreateUserRequest user, CancellationToken ct)
         {
             try
             {
-                if (id != user.Id) return BadRequest("Route id and body id must match.");
-                var exists = await _context.Users.AnyAsync(u => u.Id == id);
-                if (!exists) return NotFound();
+                var entity = await _context.Users.FirstOrDefaultAsync(u => u.Id == id, ct);
 
-                _context.Entry(user).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-                return user;
+                if (entity == null)
+                {
+                    return NotFound();
+                }
+                
+                entity.Name = user.Name;
+                entity.Gender = user.Gender;
+                entity.Email = user.Email;
+                entity.Age = user.Age;
+                entity.Weight = user.Weight;
+                entity.Height = user.Height;
+
+                await _context.SaveChangesAsync(ct);
+                return Ok(entity.ToResponse());
             }
             catch(Exception ex)
             {

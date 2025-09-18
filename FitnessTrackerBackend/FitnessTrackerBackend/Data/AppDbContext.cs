@@ -33,6 +33,7 @@ namespace FitnessTrackerBackend.Data
             {
                 e.ToTable("Exercises");
                 e.HasKey(x => x.ExerciseId);
+                e.Property(x => x.ExerciseId).IsRequired().HasMaxLength(100);
                 e.Property(x => x.Name);
                 e.Property(x => x.ImageUrl);
                 e.Property(x => x.Equipments).HasColumnType("nvarchar(max)");
@@ -65,7 +66,7 @@ namespace FitnessTrackerBackend.Data
                 e.Property(x => x.Name).IsRequired().HasMaxLength(200);
                 e.Property(x => x.Type).IsRequired().HasMaxLength(100);
                 e.Property(x => x.Description).HasColumnType("nvarchar(max)");
-                e.Property(x => x.Frequency).IsRequired();
+                e.Property(x => x.Frequency);
 
                 // JSON string columns
                 e.HasMany(x => x.Exercises)
@@ -97,6 +98,8 @@ namespace FitnessTrackerBackend.Data
                 e.ToTable("Progression");
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+
+                e.Property(x => x.ExerciseId).IsRequired().HasMaxLength(100);
 
                 e.HasOne(x => x.User)
                  .WithMany(u => u.Progressions)

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitnessTrackerBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250910100319_InitialModelCreation")]
-    partial class InitialModelCreation
+    [Migration("20250917071716_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -85,7 +85,8 @@ namespace FitnessTrackerBackend.Migrations
             modelBuilder.Entity("FitnessTrackerBackend.Models.Exercise", b =>
                 {
                     b.Property<string>("ExerciseId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BodyParts")
                         .HasColumnType("nvarchar(max)");
@@ -151,12 +152,13 @@ namespace FitnessTrackerBackend.Migrations
 
                     b.Property<string>("ExerciseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("Reps")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Weight")
@@ -221,7 +223,6 @@ namespace FitnessTrackerBackend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Frequency")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -288,7 +289,8 @@ namespace FitnessTrackerBackend.Migrations
                     b.HasOne("FitnessTrackerBackend.Models.User", "User")
                         .WithMany("Progressions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Exercise");
 
