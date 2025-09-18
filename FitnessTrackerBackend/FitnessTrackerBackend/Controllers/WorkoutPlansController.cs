@@ -41,7 +41,7 @@ namespace FitnessTrackerBackend.Controllers
 
         // GET: Workoutplan by ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<WorkoutPlanResponse>> GetWorkoutPlanById(Guid id, CancellationToken ct)
+        public async Task<ActionResult<WorkoutPlanDetailedResponse>> GetWorkoutPlanById(Guid id, CancellationToken ct)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace FitnessTrackerBackend.Controllers
                 }
 
 
-                return Ok(workoutPlan.ToResponse());
+                return Ok(workoutPlan.ToDetailedResponse());
             }
             catch (Exception ex)
             {
