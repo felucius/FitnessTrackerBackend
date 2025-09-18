@@ -36,10 +36,10 @@ namespace FitnessTrackerBackend.Controllers
         }
 
         // GET: Calendar event by workoutplan ID
-        [HttpGet("by-workoutplan/{id:guid}")]
+        [HttpGet("by-workoutplan/{id}")]
         [ProducesResponseType(typeof(CalendarEventResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetCalendarEvents(Guid id, CancellationToken ct) 
+        public async Task<ActionResult<IEnumerable<CalendarEventResponse>>> GetCalendarEvents(Guid id, CancellationToken ct) 
         {
             var calendarEvents = await _context.Calendar
                 .Where(x => x.WorkoutPlanId == id)
@@ -52,7 +52,7 @@ namespace FitnessTrackerBackend.Controllers
                     x.End,
                     x.AllDay
                 ))
-                .SingleOrDefaultAsync();
+                .ToListAsync();
 
             return Ok(calendarEvents);
         }
