@@ -69,6 +69,32 @@ namespace FitnessTrackerBackendTests
                 );
                 db.SaveChanges();
             }
+
+            if (!db.WorkoutPlans.Any())
+            {
+                db.WorkoutPlans.AddRange(
+                    new WorkoutPlan
+                    {
+                        Id = Guid.Parse("caaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                        Name = "Full body workout",
+                        Description = "Training for endurance",
+                        Exercises = new List<Exercise>(),
+                        Frequency = 2,
+                        Type = "Cardio",
+                        User = new User
+                        {
+                            Name = "Alice",
+                            Email = "alice@example.com",
+                            Age = 22,
+                            Gender = "Female",
+                            Height = 167
+                        },
+                        UserId = new Guid(),
+                    }
+                );
+
+                db.SaveChanges();
+            }
         }
     }
 }
