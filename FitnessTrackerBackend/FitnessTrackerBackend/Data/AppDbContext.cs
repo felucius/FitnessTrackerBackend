@@ -111,7 +111,7 @@ namespace FitnessTrackerBackend.Data
                  .HasForeignKey(x => x.ExerciseId)
                  .OnDelete(DeleteBehavior.Cascade);
 
-                e.Property(x => x.Date).HasColumnType("date");
+                e.Property(x => x.Date).HasColumnType("datetime2(3)");
             });
 
             // Dashboard
