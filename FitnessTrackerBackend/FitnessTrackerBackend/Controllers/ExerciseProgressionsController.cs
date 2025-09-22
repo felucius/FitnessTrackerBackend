@@ -60,6 +60,28 @@ namespace FitnessTrackerBackend.Controllers
             }
         }
 
+        // GET /api/exerciseProgressions/{id}
+        [HttpGet("by-date/{date}")]
+        public async Task<ActionResult<ExerciseProgressionResponse>> GetProgressionByDate(DateTime date, CancellationToken ct)
+        {
+            try
+            {
+                var progressionAddedDate = date.ToUniversalTime().AddHours(2);
+                var progression = await _context.Progression.FirstOrDefaultAsync(x => x.Date == progressionAddedDate);
+
+                if (progression == null)
+                {
+                    return NotFound();
+                }
+                return Ok(progression.ToResponse());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         // POST /api/exerciseProgressions
         [HttpPost]
         public async Task<ActionResult<ExerciseProgressionResponse>> CreateProgression(CreateExerciseProgressionRequest request, CancellationToken ct)
@@ -87,6 +109,33 @@ namespace FitnessTrackerBackend.Controllers
                 
                 var response = progressionDto.ToResponse();
                 return CreatedAtAction(nameof(GetProgressionById), new { id = response.Id }, response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        // PUT /api/exerciseProgressions/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProgressions(string id, CreateExerciseProgressionRequest exerciseProgression, CancellationToken ct)
+        {
+            try
+            {
+                var dateTime = exerciseProgression.Date.AddHours(2);
+                var progression = await _context.Progression.FirstOrDefaultAsync(x => x.ExerciseId == id && x.Date == dateTime);
+
+                if (progression == null)
+                {
+                    return NotFound();
+                }
+
+                progression.Weight = exerciseProgression.Weight;
+                progression.Reps = exerciseProgression.Reps;
+
+                await _context.SaveChangesAsync(ct);
+                return Ok(progression.ToResponse());
             }
             catch (Exception ex)
             {
