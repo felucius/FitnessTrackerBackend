@@ -1,5 +1,7 @@
 ﻿using FitnessTrackerBackend.Dto.Exercises;
+using FitnessTrackerBackend.Dto.Progressions;
 using FitnessTrackerBackend.Models;
+using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 
 namespace FitnessTrackerBackend.Dto.Mappings
@@ -74,7 +76,19 @@ namespace FitnessTrackerBackend.Dto.Mappings
                 e.ImageUrl,
                 e.ExerciseType,
                 e.TargetMuscles ?? Array.Empty<string>(),
-                e.BodyParts ?? Array.Empty<string>());
+                e.BodyParts ?? Array.Empty<string>(),
+                e.Progressions
+                    .OrderByDescending(p => p.Date)
+                    .Select(p => new ExerciseProgressionResponse(
+                        p.Id,
+                        p.Id,
+                        e.ExerciseId,
+                        null,
+                        p.Date,
+                        p.Weight,
+                        p.Reps
+                    ))
+            .ToList());
 
         public static readonly Expression<Func<Exercise, ExerciseResponse>> ToResponseExpr =
             e => new ExerciseResponse(

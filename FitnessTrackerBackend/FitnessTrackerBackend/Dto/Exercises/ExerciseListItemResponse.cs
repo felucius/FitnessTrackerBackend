@@ -1,4 +1,6 @@
-﻿namespace FitnessTrackerBackend.Dto.Exercises
+﻿using FitnessTrackerBackend.Dto.Progressions;
+
+namespace FitnessTrackerBackend.Dto.Exercises
 {
     public sealed record ExerciseListItemResponse(
         string ExerciseId,
@@ -7,6 +9,7 @@
         string? ImageUrl,
         string? ExerciseType,
         IReadOnlyList<string> TargetMuscles,
-        IReadOnlyList<string> BodyParts
+        IReadOnlyList<string> BodyParts,
+        IReadOnlyList<ExerciseProgressionResponse> Progressions
     );
 }
