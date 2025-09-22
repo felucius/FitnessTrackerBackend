@@ -1,4 +1,5 @@
 ﻿using FitnessTrackerBackend.Dto.Exercises;
+using FitnessTrackerBackend.Dto.Progressions;
 using FitnessTrackerBackend.Models;
 
 namespace FitnessTrackerBackend.Dto.WorkoutPlans

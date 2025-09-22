@@ -1,7 +1,6 @@
 ﻿using FitnessTrackerBackend.Data;
 using FitnessTrackerBackend.Dto.Mappings;
 using FitnessTrackerBackend.Dto.WorkoutPlans;
-using FitnessTrackerBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -75,6 +74,8 @@ namespace FitnessTrackerBackend.Controllers
                 // Get workout plans by user ID, including related Exercises and User
                 var workoutPlans = await _context.WorkoutPlans
                     .Include(wp => wp.Exercises)
+                        .ThenInclude(x => x.Progressions.Where(u => u.UserId == id)
+                        .OrderBy(x => x.Date))
                     .Include(wp => wp.User)
                     .Where(wp => wp.UserId == id)
                     .ToListAsync(ct);

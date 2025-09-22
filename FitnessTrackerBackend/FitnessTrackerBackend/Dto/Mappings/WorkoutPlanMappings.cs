@@ -1,4 +1,5 @@
 ﻿using FitnessTrackerBackend.Dto.Exercises;
+using FitnessTrackerBackend.Dto.Progressions;
 using FitnessTrackerBackend.Dto.WorkoutPlans;
 using FitnessTrackerBackend.Models;
 
@@ -54,7 +55,12 @@ namespace FitnessTrackerBackend.Dto.Mappings
                         e.ImageUrl,
                         e.ExerciseType,
                         e.TargetMuscles ?? Array.Empty<string>(),
-                        e.BodyParts ?? Array.Empty<string>()
+                        e.BodyParts ?? Array.Empty<string>(),
+                        (e.Progressions ?? Enumerable.Empty<Progression>())
+                            .Where(p => p.UserId == wp.UserId)
+                            .OrderByDescending(p => p.Date)
+                            .Select(p => new ExerciseProgressionResponse(p.Id, p.Id, e.ExerciseId, null, p.Date, p.Weight, p.Reps))
+                            .ToList()
                     ))
                     .ToList()
             );
