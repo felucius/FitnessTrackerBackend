@@ -10,7 +10,6 @@ namespace FitnessTrackerBackend.Data
         public DbSet<WorkoutPlan> WorkoutPlans => Set<WorkoutPlan>();
         public DbSet<CalendarEvent> Calendar => Set<CalendarEvent>();
         public DbSet<Progression> Progression => Set<Progression>();
-        public DbSet<Dashboard> Dashboard => Set<Dashboard>();
 
         protected override void OnModelCreating(ModelBuilder b)
         {
@@ -112,23 +111,6 @@ namespace FitnessTrackerBackend.Data
                  .OnDelete(DeleteBehavior.Cascade);
 
                 e.Property(x => x.Date).HasColumnType("datetime2(3)");
-            });
-
-            // Dashboard
-            b.Entity<Dashboard>(e =>
-            {
-                e.ToTable("Dashboard");
-                e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
-                e.Property(x => x.UserId).IsRequired();
-
-                e.HasOne(x => x.User)
-                 .WithMany() // no back-collection on User for dashboards
-                 .HasForeignKey(x => x.UserId)
-                 .OnDelete(DeleteBehavior.Cascade);
-
-                e.Property(x => x.ExercisesToPerformJson).HasColumnType("nvarchar(max)");
-                e.Property(x => x.PersonalRecordsJson).HasColumnType("nvarchar(max)");
             });
         }
     }
