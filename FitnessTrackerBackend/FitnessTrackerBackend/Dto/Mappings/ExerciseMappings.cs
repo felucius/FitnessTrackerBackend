@@ -1,7 +1,6 @@
 ﻿using FitnessTrackerBackend.Dto.Exercises;
 using FitnessTrackerBackend.Dto.Progressions;
 using FitnessTrackerBackend.Models;
-using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 
 namespace FitnessTrackerBackend.Dto.Mappings
