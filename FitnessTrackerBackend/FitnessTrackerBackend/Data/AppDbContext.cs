@@ -32,7 +32,8 @@ namespace FitnessTrackerBackend.Data
             b.Entity<Exercise>(e =>
             {
                 e.ToTable("Exercises");
-                e.HasKey(x => x.ExerciseId);
+                e.HasKey(x => x.UniqueExerciseId);
+                e.Property(x => x.UniqueExerciseId).HasDefaultValueSql("NEWID()");
                 e.Property(x => x.ExerciseId).IsRequired().HasMaxLength(100);
                 e.Property(x => x.Name);
                 e.Property(x => x.ImageUrl);
@@ -99,7 +100,7 @@ namespace FitnessTrackerBackend.Data
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
-                e.Property(x => x.ExerciseId).IsRequired().HasMaxLength(100);
+                e.Property(x => x.UniqueExerciseId).IsRequired().HasMaxLength(100);
 
                 e.HasOne(x => x.User)
                  .WithMany(u => u.Progressions)
@@ -108,7 +109,7 @@ namespace FitnessTrackerBackend.Data
 
                 e.HasOne(x => x.Exercise)
                  .WithMany(ex => ex.Progressions)
-                 .HasForeignKey(x => x.ExerciseId)
+                 .HasForeignKey(x => x.UniqueExerciseId)
                  .OnDelete(DeleteBehavior.Cascade);
 
                 e.Property(x => x.Date).HasColumnType("datetime2(3)");

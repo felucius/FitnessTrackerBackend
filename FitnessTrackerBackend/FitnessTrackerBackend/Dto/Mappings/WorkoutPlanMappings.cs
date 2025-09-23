@@ -59,7 +59,7 @@ namespace FitnessTrackerBackend.Dto.Mappings
                         (e.Progressions ?? Enumerable.Empty<Progression>())
                             .Where(p => p.UserId == wp.UserId)
                             .OrderByDescending(p => p.Date)
-                            .Select(p => new ExerciseProgressionResponse(p.Id, p.Id, e.ExerciseId, null, p.Date, p.Weight, p.Reps))
+                            .Select(p => new ExerciseProgressionResponse(p.Id, p.Id, p.UniqueExerciseId, e.ExerciseId, null, p.Date, p.Weight, p.Reps))
                             .ToList()
                     ))
                     .ToList()

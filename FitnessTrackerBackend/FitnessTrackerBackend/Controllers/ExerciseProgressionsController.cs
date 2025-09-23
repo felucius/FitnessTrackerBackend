@@ -119,12 +119,12 @@ namespace FitnessTrackerBackend.Controllers
 
         // PUT /api/exerciseProgressions/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProgressions(string id, CreateExerciseProgressionRequest exerciseProgression, CancellationToken ct)
+        public async Task<IActionResult> UpdateProgressions(Guid id, CreateExerciseProgressionRequest exerciseProgression, CancellationToken ct)
         {
             try
             {
                 var dateTime = exerciseProgression.Date.AddHours(2);
-                var progression = await _context.Progression.FirstOrDefaultAsync(x => x.ExerciseId == id && x.Date == dateTime);
+                var progression = await _context.Progression.FirstOrDefaultAsync(x => x.UniqueExerciseId == id && x.Date == dateTime);
 
                 if (progression == null)
                 {

@@ -10,6 +10,7 @@ namespace FitnessTrackerBackend.Dto.Mappings
             var response = new ExerciseProgressionResponse(
                 Id: progression.Id,
                 UserId: progression.UserId,
+                UniqueExerciseId: progression.UniqueExerciseId,
                 ExerciseId: progression.ExerciseId,
                 Exercise: progression.Exercise,
                 Date: progression.Date,
@@ -23,6 +24,7 @@ namespace FitnessTrackerBackend.Dto.Mappings
         {
             var model = new Progression
             {
+                UniqueExerciseId = request.UniqueExerciseId,
                 UserId = (Guid)request.UserId,
                 ExerciseId = request.ExerciseId,
                 Date = request.Date,

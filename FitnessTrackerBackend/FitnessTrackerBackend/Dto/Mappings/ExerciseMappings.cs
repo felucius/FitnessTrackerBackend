@@ -82,6 +82,7 @@ namespace FitnessTrackerBackend.Dto.Mappings
                     .Select(p => new ExerciseProgressionResponse(
                         p.Id,
                         p.Id,
+                        e.UniqueExerciseId,
                         e.ExerciseId,
                         null,
                         p.Date,
