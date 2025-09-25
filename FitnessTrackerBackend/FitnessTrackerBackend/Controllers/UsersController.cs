@@ -3,6 +3,8 @@ using FitnessTrackerBackend.Dto.Mappings;
 using FitnessTrackerBackend.Dto.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace FitnessTrackerBackend.Controllers
 {
@@ -105,6 +107,15 @@ namespace FitnessTrackerBackend.Controllers
             try
             {
                 var userDto = user.ToModel();
+                if (!user.Password.IsNullOrEmpty())
+                {
+                    userDto.Password = ReturnHashedPassword(user.Password!);
+                }
+                else
+                {
+                    return StatusCode(400, "Password not provided");
+                }
+
                 _context.Users.Add(userDto);
                 await _context.SaveChangesAsync(ct);
 
@@ -116,6 +127,15 @@ namespace FitnessTrackerBackend.Controllers
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
+        }
+
+        private string ReturnHashedPassword(string passwordString)
+        {
+            byte[] data = Encoding.ASCII.GetBytes(passwordString);
+            data = new System.Security.Cryptography.SHA256Managed().ComputeHash(data);
+            var hash = Encoding.ASCII.GetString(data);
+
+            return hash;
         }
 
         // PUT /api/users/{id}
