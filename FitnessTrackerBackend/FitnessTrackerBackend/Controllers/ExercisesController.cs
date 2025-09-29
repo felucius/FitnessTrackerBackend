@@ -83,13 +83,6 @@ namespace FitnessTrackerBackend.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            var exists = await _context.Exercises.AnyAsync(e => e.ExerciseId == exercise.ExerciseId, ct);
-            
-            if (exists)
-            {
-                return Conflict(new { title = "Exercise already exists" });
-            }
-
             // maps DTO -> entity (uses client ExerciseId)
             var entity = exercise.FromCreate();    
             _context.Exercises.Add(entity);
