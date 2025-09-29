@@ -46,7 +46,8 @@ namespace FitnessTrackerBackend.Controllers
             {
                 var progression = await _context.Progression
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.Id == id, ct);
+                    .FirstOrDefaultAsync(p => 
+                        p.UniqueExerciseId == id, ct);
                 if (progression == null)
                 {
                     return NotFound();
@@ -123,19 +124,31 @@ namespace FitnessTrackerBackend.Controllers
         {
             try
             {
-                var dateTime = exerciseProgression.Date.AddHours(2);
-                var progression = await _context.Progression.FirstOrDefaultAsync(x => x.UniqueExerciseId == id && x.Date == dateTime);
+                // Issue with two differnt time zones. When a PR is added and directly a change is applied, the same timezone is used.
+                // When the page has refreshed and a change is applied, it is using a different timezone/pattern. It misses 2 hours
 
-                if (progression == null)
+                var entity = await _context.Progression.FirstOrDefaultAsync(x => 
+                    x.UniqueExerciseId == exerciseProgression.UniqueExerciseId &&
+                    x.Date == exerciseProgression.Date);
+
+                // Check for differnt timezone
+                if(entity == null)
+                {
+                    entity = await _context.Progression.FirstOrDefaultAsync(x =>
+                        x.UniqueExerciseId == exerciseProgression.UniqueExerciseId &&
+                        x.Date == exerciseProgression.Date.AddHours(2));
+                }
+
+                if (entity == null)
                 {
                     return NotFound();
                 }
 
-                progression.Weight = exerciseProgression.Weight;
-                progression.Reps = exerciseProgression.Reps;
+                entity.Weight = exerciseProgression.Weight;
+                entity.Reps = exerciseProgression.Reps;
 
                 await _context.SaveChangesAsync(ct);
-                return Ok(progression.ToResponse());
+                return Ok(entity.ToResponse());
             }
             catch (Exception ex)
             {
@@ -159,7 +172,7 @@ namespace FitnessTrackerBackend.Controllers
                 
                 _context.Progression.Remove(progression);
                 await _context.SaveChangesAsync(ct);
-                return NoContent();
+                return Ok();
             }
             catch (Exception ex)
             {
