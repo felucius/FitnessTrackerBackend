@@ -3,6 +3,7 @@
 namespace FitnessTrackerBackend.Dto.Exercises
 {
     public sealed record ExerciseListItemResponse(
+        Guid UniqueExerciseId,
         string ExerciseId,
         Guid WorkoutPlanId,
         string? Name,

@@ -70,6 +70,7 @@ namespace FitnessTrackerBackend.Dto.Mappings
         // EF-friendly projections for List & Detail
         public static readonly Expression<Func<Exercise, ExerciseListItemResponse>> ToListItemExpr =
             e => new ExerciseListItemResponse(
+                e.UniqueExerciseId,
                 e.ExerciseId,
                 e.WorkoutPlanId,
                 e.Name,
