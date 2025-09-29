@@ -81,15 +81,21 @@ namespace FitnessTrackerBackend.Migrations
 
             modelBuilder.Entity("FitnessTrackerBackend.Models.Exercise", b =>
                 {
-                    b.Property<string>("ExerciseId")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<Guid>("UniqueExerciseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("BodyParts")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Equipments")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExerciseId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ExerciseTips")
                         .HasColumnType("nvarchar(max)");
@@ -130,7 +136,7 @@ namespace FitnessTrackerBackend.Migrations
                     b.Property<Guid>("WorkoutPlanId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ExerciseId");
+                    b.HasKey("UniqueExerciseId");
 
                     b.HasIndex("WorkoutPlanId");
 
@@ -149,11 +155,14 @@ namespace FitnessTrackerBackend.Migrations
 
                     b.Property<string>("ExerciseId")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Reps")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("UniqueExerciseId")
+                        .HasMaxLength(100)
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -163,7 +172,7 @@ namespace FitnessTrackerBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExerciseId");
+                    b.HasIndex("UniqueExerciseId");
 
                     b.HasIndex("UserId");
 
@@ -279,7 +288,7 @@ namespace FitnessTrackerBackend.Migrations
                 {
                     b.HasOne("FitnessTrackerBackend.Models.Exercise", "Exercise")
                         .WithMany("Progressions")
-                        .HasForeignKey("ExerciseId")
+                        .HasForeignKey("UniqueExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

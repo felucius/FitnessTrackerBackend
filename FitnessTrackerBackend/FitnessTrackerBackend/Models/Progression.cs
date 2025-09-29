@@ -5,8 +5,8 @@
         public Guid Id { get; set; } = default!;
         public Guid UserId { get; set; } = default!;
         public User? User { get; set; }
-
         public string ExerciseId { get; set; } = default!;
+        public Guid UniqueExerciseId { get; set; } = default!;
         public Exercise? Exercise { get; set; }
 
         public DateTime Date { get; set; }

@@ -2,6 +2,7 @@
 {
     public class Exercise
     {
+        public Guid UniqueExerciseId { get; set; } = default!;
         public string ExerciseId { get; set; } = default!;
 
         public Guid WorkoutPlanId { get; set; }

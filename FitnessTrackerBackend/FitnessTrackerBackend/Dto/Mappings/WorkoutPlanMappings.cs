@@ -49,6 +49,7 @@ namespace FitnessTrackerBackend.Dto.Mappings
                 Frequency: wp.Frequency,
                 Exercises: (wp.Exercises ?? new List<Exercise>())
                     .Select(e => new ExerciseListItemResponse(
+                        e.UniqueExerciseId,
                         e.ExerciseId,
                         e.WorkoutPlanId,
                         e.Name,
@@ -59,7 +60,7 @@ namespace FitnessTrackerBackend.Dto.Mappings
                         (e.Progressions ?? Enumerable.Empty<Progression>())
                             .Where(p => p.UserId == wp.UserId)
                             .OrderByDescending(p => p.Date)
-                            .Select(p => new ExerciseProgressionResponse(p.Id, p.Id, e.ExerciseId, null, p.Date, p.Weight, p.Reps))
+                            .Select(p => new ExerciseProgressionResponse(p.Id, p.UserId, p.UniqueExerciseId, e.ExerciseId, null, p.Date, p.Weight, p.Reps))
                             .ToList()
                     ))
                     .ToList()

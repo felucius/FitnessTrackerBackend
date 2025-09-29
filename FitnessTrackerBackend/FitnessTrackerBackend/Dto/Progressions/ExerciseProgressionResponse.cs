@@ -6,6 +6,7 @@ namespace FitnessTrackerBackend.Dto.Progressions
     (
         Guid Id,
         Guid? UserId,
+        Guid UniqueExerciseId,
         string ExerciseId,
         Exercise Exercise,
         DateTime Date,
