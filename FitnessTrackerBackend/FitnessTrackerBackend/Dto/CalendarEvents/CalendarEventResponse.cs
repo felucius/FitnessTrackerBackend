@@ -8,7 +8,5 @@
         DateTimeOffset Start,
         DateTimeOffset End,
         bool AllDay
-
-        // Additions will be coming in later
     );
 }
