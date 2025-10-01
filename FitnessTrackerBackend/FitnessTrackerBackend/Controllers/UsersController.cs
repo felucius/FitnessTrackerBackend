@@ -34,8 +34,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get all users: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to get all users");
             }
         }
 
@@ -58,8 +58,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get the user by its ID: {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to get the user by its ID");
             }
         }
 
@@ -80,8 +80,8 @@ namespace FitnessTrackerBackend.Controllers
                 return Ok(user.ToResponse());
             }
             catch(Exception ex) {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get a user by its email {email}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to get a user by its email");
             }
         }
 
@@ -124,8 +124,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to create a new user. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to create a new user");
             }
         }
 
@@ -163,8 +163,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to update the user by its ID {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to update the user by its ID");
             }
         }
     }

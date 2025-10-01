@@ -14,13 +14,10 @@ namespace FitnessTrackerBackend.Data
                 );
             }
 
-            //if (!db.Exercises.Any())
-            //{
-            //    db.Exercises.AddRange(
-            //        new Exercise { ExerciseId = "1", Name = "Push-up", Type = "Strength", Instructions = "Start in a plank..." },
-            //        new Exercise { ExerciseId = "2", Name = "Squat", Type = "Strength", Instructions = "Stand with feet..." }
-            //    );
-            //}
+            if (!db.Exercises.Any())
+            {
+                // Provide test data
+            }
 
             await db.SaveChangesAsync();
         }

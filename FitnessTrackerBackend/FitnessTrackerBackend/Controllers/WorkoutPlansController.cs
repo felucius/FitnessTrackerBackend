@@ -33,8 +33,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get all workout plans: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to get all workout plans");
             }
         }
 
@@ -60,8 +60,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get the workout plan by its ID {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to get the workout plan by its ID");
             }
         }
 
@@ -91,8 +91,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get the workout plans by user ID {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to get the workout plans by user ID");
             }
         }
 
@@ -100,30 +100,30 @@ namespace FitnessTrackerBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<WorkoutPlanResponse>> CreateWorkoutPlan(CreateWorkoutPlanRequest workoutPlan, CancellationToken ct)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                if (workoutPlan.UserId == Guid.Empty)
                 {
-                    if (workoutPlan.UserId == Guid.Empty)
-                    {
-                        ModelState.AddModelError(nameof(workoutPlan.UserId), "UserId is required.");
-                    }
+                    ModelState.AddModelError(nameof(workoutPlan.UserId), "UserId is required.");
+                }
 
-                    if (string.IsNullOrWhiteSpace(workoutPlan.Name))
-                    {
-                        ModelState.AddModelError(nameof(workoutPlan.Name), "Name is required.");
-                    }
+                if (string.IsNullOrWhiteSpace(workoutPlan.Name))
+                {
+                    ModelState.AddModelError(nameof(workoutPlan.Name), "Name is required.");
+                }
 
-                    if (string.IsNullOrWhiteSpace(workoutPlan.Type))
-                    {
-                        ModelState.AddModelError(nameof(workoutPlan.Type), "Type is required.");
-                    }
+                if (string.IsNullOrWhiteSpace(workoutPlan.Type))
+                {
+                    ModelState.AddModelError(nameof(workoutPlan.Type), "Type is required.");
+                }
 
-                    if (!ModelState.IsValid)
-                    {
-                        return ValidationProblem(ModelState);
-                    }
-                    
+                if (!ModelState.IsValid)
+                {
+                    return ValidationProblem(ModelState);
+                }
+
+                try
+                {
                     var workoutPlanDto = workoutPlan.ToModel();
                     _context.WorkoutPlans.Add(workoutPlanDto);
                     await _context.SaveChangesAsync(ct);
@@ -131,34 +131,43 @@ namespace FitnessTrackerBackend.Controllers
                     var response = workoutPlanDto.ToResponse();
                     return CreatedAtAction(nameof(GetWorkoutPlanById), new { id = response.Id }, response);
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred when trying to create a workoutplan. Exception: {ex.Message}");
+                    return StatusCode(500, "An error occurred when trying to create a workoutplan");
+                }
+            }
 
-                return BadRequest(ModelState);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            return BadRequest(ModelState);
         }
 
         // PUT: Update an existing WorkoutPlan
         [HttpPut("{id}")]
         public async Task<ActionResult<WorkoutPlanDetailedResponse>> UpdateWorkoutPlan(Guid id, CreateWorkoutPlanRequest workoutPlan, CancellationToken ct)
         {
-            var entity = await _context.WorkoutPlans.FirstOrDefaultAsync(wp => wp.Id == id, ct);
-
-            if(entity == null)
+            try
             {
-                return NotFound();
+                var entity = await _context.WorkoutPlans.FirstOrDefaultAsync(wp => wp.Id == id, ct);
+
+                if(entity == null)
+                {
+                    return NotFound();
+                }
+
+                entity.Name = workoutPlan.Name;
+                entity.Type = workoutPlan.Type;
+                entity.Description = workoutPlan.Description;
+                entity.Frequency = workoutPlan.Frequency;
+
+                await _context.SaveChangesAsync(ct);
+                return Ok(entity.ToDetailedResponse());
+
             }
-
-            entity.Name = workoutPlan.Name;
-            entity.Type = workoutPlan.Type;
-            entity.Description = workoutPlan.Description;
-            entity.Frequency = workoutPlan.Frequency;
-
-            await _context.SaveChangesAsync(ct);
-            return Ok(entity.ToDetailedResponse());
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred when trying to update the workoutplan with ID {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to update the workoutplan by its ID");
+            }
         }
 
         // DELETE: Delete a WorkoutPlan
@@ -180,8 +189,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to delete the workoutplan by its ID: {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to delete the workoutplan by its ID");
             }
         }
     }
