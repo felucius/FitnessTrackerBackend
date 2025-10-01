@@ -75,8 +75,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex) 
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to retrieve dashboard metrics by user ID. Exception: {ex.Message}");
+                return StatusCode(500, "An error occured when trying to retrieve dashboard metrics by user ID.");
             }
         }
     }

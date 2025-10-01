@@ -33,8 +33,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to retrieve all exercises. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to retrieve all exercises");
             }
         }
 
@@ -58,8 +58,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to retrieve an exercise by its ID {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to retrieve an exercise by its ID");
             }
         }
 
@@ -83,14 +83,20 @@ namespace FitnessTrackerBackend.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            // maps DTO -> entity (uses client ExerciseId)
-            var entity = exercise.FromCreate();    
-            _context.Exercises.Add(entity);
-            await _context.SaveChangesAsync(ct);
+            try
+            {
+                var entity = exercise.FromCreate();    
+                _context.Exercises.Add(entity);
+                await _context.SaveChangesAsync(ct);
 
-            // entity -> DTO
-            var response = entity.ToResponse(); 
-            return CreatedAtAction(nameof(GetExerciseById), new { id = response.ExerciseId }, response);
+                var response = entity.ToResponse(); 
+                return CreatedAtAction(nameof(GetExerciseById), new { id = response.ExerciseId }, response);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred when trying to create a new exercise. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to create a new exercise");
+            }
         }
 
         // DELETE: api/exercises/{id}
@@ -112,8 +118,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to delete an exercise by its ID: {id}: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to delete an exercise by its ID");
             }
         }
     }

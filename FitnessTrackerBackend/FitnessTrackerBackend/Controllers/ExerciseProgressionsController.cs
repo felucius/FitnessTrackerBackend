@@ -33,8 +33,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get all exercise progressions. Exception: {ex.Message}");
+                return StatusCode(500, "An error occured when trying to get all exercise progressions");
             }
         }
 
@@ -56,8 +56,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get the exercise progression by ID. Exception: {ex.Message}");
+                return StatusCode(500, "An error occured when trying to get the exercise progression by ID");
             }
         }
 
@@ -78,8 +78,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to get the exercise progression by date. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to get the exercise progression by date");
             }
         }
 
@@ -110,11 +110,12 @@ namespace FitnessTrackerBackend.Controllers
                 
                 var response = progressionDto.ToResponse();
                 return CreatedAtAction(nameof(GetProgressionById), new { id = response.Id }, response);
+
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occured when trying to create an exercise progression. Exception: {ex.Message}");
+                return StatusCode(500, "An error occured when trying to create an exercise progression");
             }
         }
 
@@ -152,8 +153,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to update the exercise progression by its ID: {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to update the exercise progression by its ID");
             }
         }
 
@@ -176,8 +177,8 @@ namespace FitnessTrackerBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                Console.WriteLine($"An error occurred when trying to delete the exercise progression by its ID: {id}. Exception: {ex.Message}");
+                return StatusCode(500, "An error occurred when trying to delete the exercise progression by its ID");
             }
         }
     }
